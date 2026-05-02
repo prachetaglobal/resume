@@ -1,0 +1,45 @@
+/* ── Minimal Template ─────────────────────────────────────── */
+:root {
+    --primary-color:   #111111;
+    --accent-color:    #444444;
+    --font-heading:    'Arial', sans-serif;
+    --font-body:       'Calibri', sans-serif;
+    --font-size-h:     15px;
+    --font-size-b:     11px;
+    --line-height:     1.6;
+    --section-spacing: 20px;
+    --page-margin:     22mm;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); font-size: var(--font-size-b); color: #222; background: #fff; line-height: var(--line-height); }
+.resume-wrap { width: 210mm; min-height: 297mm; padding: var(--page-margin); background: #fff; }
+.r-header { text-align: center; margin-bottom: calc(var(--section-spacing) * 1.2); }
+.r-name  { font-family: var(--font-heading); font-size: calc(var(--font-size-h) * 1.8); font-weight: 700; color: var(--primary-color); letter-spacing: .02em; }
+.r-title { color: var(--accent-color); font-size: calc(var(--font-size-b) * 1.05); margin-top: 4px; }
+.r-contact { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: calc(var(--font-size-b) * 0.9); color: #666; }
+.r-section { margin-bottom: var(--section-spacing); }
+.r-section-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h);
+    font-weight: 700;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ccc;
+}
+.r-item { margin-bottom: 10px; }
+.r-item-header { display: flex; justify-content: space-between; align-items: baseline; }
+.r-item-title  { font-family: var(--font-heading); font-weight: 700; }
+.r-item-date   { color: #999; font-size: calc(var(--font-size-b) * 0.9); white-space: nowrap; }
+.r-item-sub    { color: #555; font-style: italic; font-size: calc(var(--font-size-b) * 0.95); }
+.r-item-desc   { color: #333; margin-top: 3px; }
+.r-item-desc ul { padding-left: 16px; margin: 4px 0; }
+.r-skills-list { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.r-skill-tag   { color: #333; font-size: calc(var(--font-size-b) * 0.95); }
+.r-skill-tag::before { content: '– '; color: #bbb; }
+@media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .resume-wrap { width: 100%; padding: 15mm; }
+}

@@ -1,0 +1,8 @@
+/* ── Auth Pages ───────────────────────────────────────────── */
+.auth-page { background: linear-gradient(135deg, #e8ecf0 0%, #dde3ea 100%); }
+.auth-card  { border-radius: 16px; }
+.auth-card .card-body { border-radius: 16px; }
+
+.password-strength { margin-top: 6px; }
+.form-control-lg   { border-radius: 8px; }
+.btn-lg            { border-radius: 8px; }

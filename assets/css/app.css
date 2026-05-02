@@ -1,0 +1,42 @@
+/* ── Global App Styles ────────────────────────────────────── */
+
+:root {
+    --rc-primary: #0d6efd;
+    --rc-dark:    #1a1d23;
+}
+
+body { background: #f8f9fa; }
+
+/* Navbar */
+.navbar { min-height: 56px; }
+.avatar-sm { width: 30px; height: 30px; font-size: .75rem; }
+
+/* Landing */
+.hero-section { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
+.feature-icon { width: 56px; height: 56px; display: flex !important; align-items: center; justify-content: center; }
+
+/* Dashboard */
+.resume-card { transition: transform .15s, box-shadow .15s; }
+.resume-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.1) !important; }
+.resume-thumb { height: 120px; }
+
+/* Template picker */
+.template-card { transition: border-color .15s, background .15s; cursor: pointer; }
+.template-card:hover { border-color: var(--rc-primary) !important; background: #f0f7ff; }
+.template-option input:checked + .template-card { border-color: var(--rc-primary) !important; background: #e8f0fe; }
+
+/* Cursor helper */
+.cursor-pointer { cursor: pointer; }
+
+/* Utility */
+.btn-xs { padding: 2px 8px; font-size: .75rem; }
+.text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Flash */
+.alert { border-radius: 8px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #aaa; }

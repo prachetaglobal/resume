@@ -1,0 +1,48 @@
+/* ── Executive Template ───────────────────────────────────── */
+:root {
+    --primary-color:   #1a1a1a;
+    --accent-color:    #8b6914;
+    --font-heading:    'Georgia', serif;
+    --font-body:       'Times New Roman', serif;
+    --font-size-h:     16px;
+    --font-size-b:     11px;
+    --line-height:     1.55;
+    --section-spacing: 16px;
+    --page-margin:     20mm;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); font-size: var(--font-size-b); color: #111; background: #fff; line-height: var(--line-height); }
+.resume-wrap { width: 210mm; min-height: 297mm; padding: var(--page-margin); background: #fff; }
+.r-header { text-align: center; padding-bottom: 14px; margin-bottom: var(--section-spacing); border-bottom: 3px double var(--primary-color); }
+.r-name  { font-family: var(--font-heading); font-size: calc(var(--font-size-h) * 1.9); font-weight: 700; color: var(--primary-color); letter-spacing: .06em; text-transform: uppercase; }
+.r-title { color: var(--accent-color); font-size: calc(var(--font-size-b) * 1.1); font-style: italic; margin-top: 4px; }
+.r-contact { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 16px; margin-top: 8px; font-size: calc(var(--font-size-b) * 0.92); color: #444; }
+.r-section { margin-bottom: var(--section-spacing); }
+.r-section-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h);
+    font-weight: 700;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    text-align: center;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-top: 1px solid var(--accent-color);
+    border-bottom: 1px solid var(--accent-color);
+    padding-top: 4px;
+}
+.r-item { margin-bottom: 11px; }
+.r-item-header { display: flex; justify-content: space-between; align-items: baseline; }
+.r-item-title  { font-family: var(--font-heading); font-weight: 700; font-size: calc(var(--font-size-b) * 1.05); }
+.r-item-date   { color: var(--accent-color); font-style: italic; font-size: calc(var(--font-size-b) * 0.92); white-space: nowrap; }
+.r-item-sub    { color: #555; font-style: italic; font-size: calc(var(--font-size-b) * 0.95); }
+.r-item-desc   { color: #333; margin-top: 3px; }
+.r-item-desc ul { padding-left: 18px; margin: 4px 0; }
+.r-skills-list { columns: 2; gap: 16px; }
+.r-skill-tag   { display: block; padding: 1px 0; color: #333; }
+.r-skill-tag::before { content: '◆ '; color: var(--accent-color); font-size: .7em; }
+@media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .resume-wrap { width: 100%; padding: 15mm; }
+}

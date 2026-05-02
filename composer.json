@@ -1,0 +1,16 @@
+{
+    "name": "resume-maker/app",
+    "description": "ATS-friendly resume builder",
+    "require": {
+        "mpdf/mpdf": "^8.2",
+        "ramsey/uuid": "^4.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "includes/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

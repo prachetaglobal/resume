@@ -1,0 +1,77 @@
+/* ── Editor Layout ────────────────────────────────────────── */
+
+.editor-layout { height: calc(100vh - 56px); overflow: hidden; }
+
+/* Left panel */
+.editor-panel {
+    width: 380px;
+    min-width: 320px;
+    max-width: 420px;
+    background: #fff;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    resize: horizontal;
+}
+
+.editor-topbar  { background: #fff; flex-shrink: 0; }
+.editor-tabs    { flex-shrink: 0; }
+.tab-content    { flex: 1; overflow-y: auto; }
+
+/* Sections accordion */
+.section-block { border-radius: 8px !important; }
+.section-header:hover { background: #f8f9fa !important; }
+.section-chevron { transition: transform .2s; }
+.section-block.open .section-chevron { transform: rotate(180deg); }
+
+/* Item blocks */
+.item-block { border-radius: 6px !important; }
+
+/* Preview pane */
+.preview-pane { background: #e8eaed; overflow-y: auto; }
+.preview-toolbar { background: #fff; flex-shrink: 0; }
+
+.preview-wrapper { padding: 24px; }
+
+.preview-page {
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: width .2s;
+}
+
+.preview-page iframe {
+    width: 210mm;
+    height: 297mm;
+    border: none;
+    display: block;
+    transform-origin: top left;
+}
+
+/* Template switcher */
+.tpl-option { border-radius: 8px !important; cursor: pointer; transition: border-color .15s; }
+.tpl-option:hover { border-color: #0d6efd !important; }
+.tpl-radio:checked + .tpl-option { border-color: #0d6efd !important; background: #e8f0fe; }
+
+/* Theme preset buttons */
+.theme-preset {
+    width: 28px; height: 28px; border-radius: 50%; padding: 0;
+    cursor: pointer; transition: transform .15s;
+}
+.theme-preset:hover { transform: scale(1.2); }
+
+/* Save status */
+#saveStatus { font-size: .7rem; min-width: 60px; text-align: center; }
+
+/* Drag handle */
+.drag-handle { cursor: grab; }
+.drag-handle:active { cursor: grabbing; }
+.sortable-ghost { opacity: .4; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .editor-container { flex-direction: column; }
+    .editor-panel { width: 100%; max-width: 100%; height: 50vh; resize: none; }
+    .preview-pane  { height: 50vh; }
+    .preview-page iframe { width: 100%; height: 100%; }
+}

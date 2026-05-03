@@ -42,7 +42,10 @@ resume/
 │   ├── export.php          # PDF generation endpoint (enforces download limits)
 │   └── resume.php          # CRUD operations for resume data
 ├── admin/
-│   └── plan-settings.php   # Admin panel: edit plan limits & view export log
+│   ├── index.php           # Admin dashboard (stats, charts, recent activity)
+│   ├── plan-settings.php   # Edit plan limits & view export log
+│   ├── layout_start.php    # Shared admin sidebar + topbar layout (open)
+│   └── layout_end.php      # Shared admin layout (close)
 ├── assets/                 # CSS, JS, images
 ├── config/
 │   ├── app.php             # App constants, env settings

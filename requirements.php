@@ -41,7 +41,8 @@ $requiredTables = [
 
 // Admin pages
 $adminPaths = [
-    __DIR__ . '/admin/plan-settings.php' => 'admin/plan-settings.php (admin plan settings panel)',
+    __DIR__ . '/admin/index.php'         => 'admin/index.php (admin dashboard)',
+    __DIR__ . '/admin/plan-settings.php' => 'admin/plan-settings.php (plan settings panel)',
 ];
 
 // ── Evaluate ─────────────────────────────────────────────────────────────────

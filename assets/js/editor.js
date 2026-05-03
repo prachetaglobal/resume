@@ -113,16 +113,14 @@ $(function () {
         e.preventDefault();
         const sectionId = $(this).data('section-id');
         const $list     = $(this).closest('.section-body').find('.items-list');
-        const $btn      = $(this);
 
         apiPost('/api/resume.php', {action: 'add_item', section_id: sectionId}, function (r) {
             if (!r.ok) return;
-            // Reload preview; form will show new item after page reload
-            // For a nicer UX, insert a placeholder and let user type
             const type  = $list.closest('[data-type]').data('type') || 'custom';
             const newHtml = buildItemHtml(type, r.item_id);
             $list.append(newHtml);
             reloadPreview();
+            setTimeout(initItemsSortable, 100);
         });
     });
 
@@ -229,6 +227,53 @@ $(function () {
             if (r.ok) location.reload();
         });
     });
+
+    // ── Drag & Drop Reordering ──────────────────────────────
+    
+    // 1. Sections reorder
+    new Sortable(document.getElementById('sectionsList'), {
+        handle: '.drag-handle',
+        animation: 150,
+        ghostClass: 'bg-light',
+        onEnd: function() {
+            const ids = [];
+            $('#sectionsList .section-block').each(function() {
+                ids.push($(this).data('section-id'));
+            });
+            setStatus('saving');
+            apiPost('/api/resume.php', {action: 'reorder_sections', ids: ids}, function(r) {
+                if (r.ok) { setStatus('saved'); reloadPreview(); }
+            });
+        }
+    });
+
+    // 2. Items reorder (within sections)
+    function initItemsSortable() {
+        $('.items-list').each(function() {
+            if (this.sortable) return; // Already init
+            this.sortable = new Sortable(this, {
+                animation: 150,
+                draggable: '.item-block',
+                ghostClass: 'opacity-50',
+                onEnd: function(evt) {
+                    const sectionId = $(evt.from).data('section-id');
+                    const ids = [];
+                    $(evt.from).find('.item-block').each(function() {
+                        ids.push($(this).data('item-id'));
+                    });
+                    setStatus('saving');
+                    apiPost('/api/resume.php', {
+                        action: 'reorder_items', 
+                        section_id: sectionId, 
+                        ids: ids
+                    }, function(r) {
+                        if (r.ok) { setStatus('saved'); reloadPreview(); }
+                    });
+                }
+            });
+        });
+    }
+    initItemsSortable();
 
     // ── Preview zoom ─────────────────────────────────────────
 

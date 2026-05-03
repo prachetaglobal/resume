@@ -25,6 +25,7 @@ $pageTitle = 'Edit: ' . $resume['title'] . ' — ' . APP_NAME;
 $bodyClass = 'editor-layout d-flex flex-column';
 $extraCss  = [ASSETS_URL . '/css/editor.css'];
 $extraJs   = [
+    'https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js',
     ASSETS_URL . '/js/editor.js',
     ASSETS_URL . '/js/customizer.js',
 ];

@@ -384,6 +384,11 @@
             <i class="bi bi-file-earmark-person"></i> Resumes
         </a>
 
+        <a href="<?= APP_URL ?>/admin/templates.php"
+           class="sidebar-link <?= ($adminPage ?? '') === 'templates' ? 'active' : '' ?>">
+            <i class="bi bi-layout-text-sidebar"></i> Templates
+        </a>
+
         <div class="sidebar-section" style="margin-top:.5rem">Settings</div>
 
         <a href="<?= APP_URL ?>/admin/site-settings.php"

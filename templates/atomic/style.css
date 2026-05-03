@@ -1,0 +1,277 @@
+/* ── Atomic Template ──────────────────────────────────────────── */
+/* Inspired by myperfectresume.com skin: hrt1_atmc_7              */
+
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap');
+
+:root {
+    --primary-color:    #26A7FF;
+    --accent-color:     #1a8fe0;
+    --font-heading:     'Lora', Georgia, serif;
+    --font-body:        'Open Sans', Arial, sans-serif;
+    --font-size-h:      13px;
+    --font-size-b:      11px;
+    --line-height:      1.5;
+    --section-spacing:  14px;
+    --page-margin:      14mm;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body, .resume-preview-embed {
+    background: #fff;
+    color: #222;
+    font-family: var(--font-body);
+    font-size: var(--font-size-b);
+    line-height: var(--line-height);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* ── Outer Wrap ── */
+.at-wrap {
+    width: 100%;
+    min-height: 297mm;
+    background: #fff;
+    padding: var(--page-margin);
+    padding-bottom: 10mm;
+}
+
+/* ── Header ── */
+.at-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    padding-bottom: 10px;
+    margin-bottom: 8px;
+}
+
+.at-photo-wrap {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 72px;
+    height: 72px;
+}
+
+.at-photo {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+}
+
+.at-photo-placeholder {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #e8f4ff;
+    border: 3px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: var(--primary-color);
+}
+
+.at-name {
+    font-family: var(--font-heading);
+    font-size: calc(var(--font-size-h) * 2.2);
+    font-weight: 700;
+    font-variant: small-caps;
+    letter-spacing: 2px;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+    text-transform: capitalize;
+}
+
+.at-title {
+    font-size: calc(var(--font-size-b) * 1.05);
+    color: #555;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.at-contact {
+    font-size: var(--font-size-b);
+    color: #444;
+    line-height: 1.7;
+}
+
+.at-contact span {
+    margin: 0 4px;
+}
+
+.at-contact .at-sep {
+    color: #bbb;
+}
+
+/* ── Section Divider ── */
+.at-section {
+    margin-bottom: var(--section-spacing);
+    page-break-inside: avoid;
+}
+
+.at-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.at-section-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-h);
+    font-weight: 700;
+    font-variant: small-caps;
+    color: var(--primary-color);
+    text-transform: capitalize;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    padding-right: 10px;
+    flex-shrink: 0;
+}
+
+.at-section-line {
+    flex: 1;
+    height: 2px;
+    background: var(--primary-color);
+    opacity: 0.35;
+}
+
+/* ── Two-column row (date | content) ── */
+.at-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    page-break-inside: avoid;
+}
+
+.at-date-col {
+    width: 100px;
+    flex-shrink: 0;
+    font-size: calc(var(--font-size-b) * 0.92);
+    color: #555;
+    padding-top: 1px;
+    line-height: 1.6;
+}
+
+.at-content-col {
+    flex: 1;
+    min-width: 0;
+}
+
+.at-item-title {
+    font-weight: 700;
+    font-size: var(--font-size-b);
+    color: #222;
+    line-height: 1.4;
+}
+
+.at-item-subtitle {
+    font-size: calc(var(--font-size-b) * 0.95);
+    color: #555;
+    margin-bottom: 2px;
+}
+
+.at-item-sub-dash {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.at-item-desc {
+    font-size: var(--font-size-b);
+    color: #333;
+    margin-top: 4px;
+    line-height: 1.6;
+}
+
+.at-item-desc ul {
+    padding-left: 16px;
+    margin: 0;
+}
+
+.at-item-desc li {
+    margin-bottom: 2px;
+}
+
+/* ── Summary (no date col) ── */
+.at-summary {
+    font-size: var(--font-size-b);
+    color: #333;
+    line-height: 1.7;
+    padding-left: 0;
+}
+
+/* ── Skills ── */
+.at-skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-left: 0;
+}
+
+.at-skill-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.at-skill-name {
+    font-size: var(--font-size-b);
+    color: #222;
+    font-weight: 600;
+}
+
+.at-skill-bar-track {
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    width: 60%;
+    overflow: hidden;
+}
+
+.at-skill-bar-fill {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 3px;
+    width: 75%;
+}
+
+/* ── Languages (similar to skills) ── */
+.at-lang-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.at-lang-name {
+    font-size: var(--font-size-b);
+    color: #222;
+    min-width: 80px;
+}
+
+/* ── Simple bullet list (certifications, awards, etc.) ── */
+.at-bullet-list {
+    padding-left: 16px;
+    margin: 0;
+}
+
+.at-bullet-list li {
+    font-size: var(--font-size-b);
+    color: #333;
+    margin-bottom: 3px;
+    line-height: 1.6;
+}
+
+/* ── Print ── */
+@media print {
+    .at-wrap {
+        padding: var(--page-margin);
+    }
+    .at-section {
+        page-break-inside: avoid;
+    }
+}

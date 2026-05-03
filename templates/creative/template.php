@@ -1,44 +1,61 @@
 <?php
 $personal = []; $summary = '';
-foreach ($sections as $sec) { 
-        if ($sec['type'] === 'personal') $personalSectionId = $sec['id'];
-        if ($sec['type'] === 'summary')  $summarySectionId = $sec['id'];
-    if ($sec['type'] === 'personal' && !empty($sec['items'])) { $personal = $sec['items'][0]['fields'] ?? []; $personalItemId = $sec['items'][0]['id']; }
-    if ($sec['type'] === 'summary'  && !empty($sec['items'])) $summary  = $sec['items'][0]['fields']['summary'] ?? '';
+$personalItemId = 0; $personalSectionId = 0;
+foreach ($sections as $sec) {
+    if ($sec['type'] === 'personal' && !empty($sec['items'])) {
+        $personal          = $sec['items'][0]['fields'] ?? [];
+        $personalItemId    = $sec['items'][0]['id'];
+        $personalSectionId = $sec['id'];
+    }
+    if ($sec['type'] === 'summary' && !empty($sec['items'])) {
+        $summary = $sec['items'][0]['fields']['summary'] ?? '';
+    }
 }
 ?>
 <div class="resume-wrap">
-    
-    <div class="r-body">
-        <?php foreach ($sections as $sec): 
-            if (empty($sec['items'])) continue;
-            if (!$sec['is_visible'] || $sec['type'] === 'personal' || empty($sec['items'])) continue; ?>
-        <?php if ($sec['type'] === 'personal'): ?>
-            <header class="r-header r-section" data-section-id="<?= $personalSectionId ?? 0 ?>" data-item-id="<?= $personalItemId ?? 0 ?>">
+
+    <!-- Header -->
+    <header class="r-header r-section" data-section-id="<?= $personalSectionId ?>" data-item-id="<?= $personalItemId ?>">
         <div class="r-name r-header-item" data-field-key="name"><?= e($personal['name'] ?? 'Your Name') ?></div>
-        <?php if (!empty($personal['job_title'])): ?><div class="r-title r-header-item" data-field-key="job_title"><?= e($personal['job_title']) ?></div><?php endif; ?>
-        <div class="r-contact" data-field-key="contact" data-item-id="<?= $personalItemId ?? 0 ?>">
-            <?php foreach ($personal as $key => $val): 
+        <?php if (!empty($personal['job_title'])): ?>
+        <div class="r-title r-header-item" data-field-key="job_title"><?= e($personal['job_title']) ?></div>
+        <?php endif; ?>
+        <div class="r-contact" data-field-key="contact" data-item-id="<?= $personalItemId ?>">
+            <?php foreach ($personal as $key => $val):
                 if (in_array($key, ['name','job_title']) || empty($val)) continue;
-                $icon = ['email'=>'✉', 'phone'=>'✆', 'location'=>'⌖', 'linkedin'=>'in', 'website'=>'⬡', 'github'=>'⌥'][$key] ?? '•';
+                $icon = ['email'=>'✉','phone'=>'✆','location'=>'⌖','linkedin'=>'in','website'=>'⬡','github'=>'⌥'][$key] ?? '•';
             ?>
-                <span class="r-contact-item" data-field-key="<?= e($key) ?>"><?= $icon ?> <?= e($val) ?></span>
+            <span class="r-contact-item" data-field-key="<?= e($key) ?>"><?= $icon ?> <?= e($val) ?></span>
             <?php endforeach; ?>
         </div>
     </header>
-        <?php else: ?><section class="r-section" data-section-id="<?= $sec["id"] ?>">
+
+    <div class="r-body">
+        <?php foreach ($sections as $sec):
+            if ($sec['type'] === 'personal') continue;
+            if (!$sec['is_visible'] || empty($sec['items'])) continue;
+        ?>
+        <section class="r-section" data-section-id="<?= $sec['id'] ?>">
             <h2 class="r-section-title"><?= e($sec['title']) ?></h2>
+
             <?php if ($sec['type'] === 'summary'): ?>
                 <p><?= nl2br(e($summary)) ?></p>
+
             <?php elseif ($sec['type'] === 'skills'): ?>
                 <?php $skills = array_filter(array_map('trim', explode(',', $sec['items'][0]['fields']['skills'] ?? ''))); ?>
-                <div class="r-skills-list"><?php foreach ($skills as $sk): ?><span class="r-skill-tag"><?= e($sk) ?></span><?php endforeach; ?></div>
+                <div class="r-skills-list">
+                    <?php foreach ($skills as $sk): ?><span class="r-skill-tag"><?= e($sk) ?></span><?php endforeach; ?>
+                </div>
+
             <?php elseif ($sec['type'] === 'languages'): ?>
                 <?php $langs = array_filter(array_map('trim', explode(',', $sec['items'][0]['fields']['languages'] ?? ''))); ?>
-                <div class="r-skills-list"><?php foreach ($langs as $l): ?><span class="r-skill-tag"><?= e($l) ?></span><?php endforeach; ?></div>
+                <div class="r-skills-list">
+                    <?php foreach ($langs as $l): ?><span class="r-skill-tag"><?= e($l) ?></span><?php endforeach; ?>
+                </div>
+
             <?php elseif ($sec['type'] === 'experience'): ?>
                 <?php foreach ($sec['items'] as $item): $f = $item['fields']; ?>
-                <div class="r-item" data-item-id="<?= $item["id"] ?>">
+                <div class="r-item" data-item-id="<?= $item['id'] ?>">
                     <div class="r-item-header">
                         <span class="r-item-title"><?= e($f['job_title'] ?? '') ?></span>
                         <span class="r-item-date"><?= e($f['start_date'] ?? '') ?><?= !empty($f['end_date']) ? ' – '.e($f['end_date']) : '' ?></span>
@@ -47,19 +64,21 @@ foreach ($sections as $sec) {
                     <?php if (!empty($f['description'])): ?><div class="r-item-desc"><?= nl2br(e($f['description'])) ?></div><?php endif; ?>
                 </div>
                 <?php endforeach; ?>
+
             <?php elseif ($sec['type'] === 'education'): ?>
                 <?php foreach ($sec['items'] as $item): $f = $item['fields']; ?>
-                <div class="r-item" data-item-id="<?= $item["id"] ?>">
+                <div class="r-item" data-item-id="<?= $item['id'] ?>">
                     <div class="r-item-header">
                         <span class="r-item-title"><?= e($f['degree'] ?? '') ?></span>
                         <span class="r-item-date"><?= e($f['start_date'] ?? '') ?><?= !empty($f['end_date']) ? ' – '.e($f['end_date']) : '' ?></span>
                     </div>
-                    <div class="r-item-sub"><?= e($f['institution'] ?? '') ?></div>
+                    <div class="r-item-sub"><?= e($f['institution'] ?? '') ?><?= !empty($f['gpa']) ? ' · GPA: '.e($f['gpa']) : '' ?></div>
                 </div>
                 <?php endforeach; ?>
+
             <?php else: ?>
                 <?php foreach ($sec['items'] as $item): $f = $item['fields']; ?>
-                <div class="r-item" data-item-id="<?= $item["id"] ?>">
+                <div class="r-item" data-item-id="<?= $item['id'] ?>">
                     <div class="r-item-header">
                         <span class="r-item-title"><?= e($f['title'] ?? '') ?></span>
                         <span class="r-item-date"><?= e($f['date'] ?? '') ?></span>
@@ -67,6 +86,7 @@ foreach ($sections as $sec) {
                     <?php if (!empty($f['description'])): ?><div class="r-item-desc"><?= nl2br(e($f['description'])) ?></div><?php endif; ?>
                 </div>
                 <?php endforeach; ?>
+
             <?php endif; ?>
         </section>
         <?php endforeach; ?>

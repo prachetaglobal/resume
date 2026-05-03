@@ -147,6 +147,34 @@ INSERT INTO templates (slug, name, description, category, is_ats_friendly, is_pr
 ('tech',          'Tech',           'Compact, skills-forward layout built for developers.',          'modern',       1, 0, 7),
 ('creative',      'Creative',       'Geometric accent, contemporary typography. Design-friendly.',   'creative',     0, 0, 8);
 
+-- ============================================================
+-- SEED: Users  (admin + demo)
+-- admin  → admin@example.com  / Admin@123
+-- demo   → demo@example.com   / Demo@123
+-- ============================================================
+INSERT INTO users (uuid, name, email, password, role, plan, email_verified_at, is_active) VALUES
+(
+    UUID(),
+    'Admin',
+    'admin@example.com',
+    '$2y$12$Rd9OjWgGFijOX9ZX0aZpru463aT0c0QdYHtrd1ri3g6/hZtNL.IeC',
+    'admin',
+    'enterprise',
+    NOW(),
+    1
+),
+(
+    UUID(),
+    'Demo User',
+    'demo@example.com',
+    '$2y$12$uZkaMC35SNEx23OQy7NISuHsI1iZY7bbpmxp8HqoOyJTEjm7zPJnm',
+    'user',
+    'free',
+    NOW(),
+    1
+);
+
+-- ============================================================
 INSERT INTO template_themes (template_id, name, primary_color, accent_color, is_default) VALUES
 (1,'Navy','#1a2e4a','#2c5f8a',1),(1,'Charcoal','#2d2d2d','#555555',0),(1,'Forest','#1e3a2f','#2d6a4f',0),
 (2,'Ocean','#0d3b66','#1e88e5',1),(2,'Slate','#2c3e50','#3498db',0),(2,'Teal','#00514a','#00897b',0),(2,'Burgundy','#6b1e2e','#c0392b',0),

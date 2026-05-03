@@ -2,7 +2,7 @@
     "name": "resume-maker/app",
     "description": "ATS-friendly resume builder",
     "require": {
-        "mpdf/mpdf": "^8.2",
+        "mpdf/mpdf": "^8.2.5",
         "ramsey/uuid": "^4.7"
     },
     "autoload": {

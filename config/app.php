@@ -1,6 +1,6 @@
 <?php
 define('APP_NAME',    'ResumeCraft');
-define('APP_URL',     'http://localhost/resume');
+define('APP_URL',     'http://localhost');
 define('APP_VERSION', '1.0.0');
 define('APP_ENV',     'development'); // change to 'production' when live
 

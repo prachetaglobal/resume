@@ -42,10 +42,14 @@ resume/
 │   ├── export.php          # PDF generation endpoint (enforces download limits)
 │   └── resume.php          # CRUD operations for resume data
 ├── admin/
-│   ├── index.php           # Admin dashboard (stats, charts, recent activity)
-│   ├── plan-settings.php   # Edit plan limits & view export log
-│   ├── layout_start.php    # Shared admin sidebar + topbar layout (open)
-│   └── layout_end.php      # Shared admin layout (close)
+│   ├── index.php              # Admin dashboard (stats, plan distribution, recent activity)
+│   ├── users.php              # User management (search, edit, reset password, delete)
+│   ├── resumes.php            # Resume management (search, preview, delete)
+│   ├── site-settings.php      # Branding: app name, logo, colour, flags
+│   ├── plan-settings.php      # Plan limits and PDF download caps
+│   ├── logs.php               # Activity log viewer (colour-coded, filterable)
+│   ├── layout_start.php       # Shared admin sidebar + topbar (open)
+│   └── layout_end.php         # Shared admin layout (close)
 ├── assets/                 # CSS, JS, images
 ├── config/
 │   ├── app.php             # App constants, env settings
@@ -54,6 +58,8 @@ resume/
 │   ├── Auth.php            # Session & authentication logic
 │   ├── Database.php        # PDO singleton
 │   ├── PlanLimits.php      # DB-driven plan limit helper (resumes + exports)
+│   ├── SiteSettings.php    # Key-value site settings helper (app name, logo, flags)
+│   ├── ActivityLog.php     # Audit trail writer and reader
 │   ├── Resume.php          # Core resume model & queries
 │   ├── functions.php       # Shared helper functions
 │   ├── header.php          # Shared HTML header/navbar
@@ -68,9 +74,10 @@ resume/
 │   ├── tech/
 │   └── creative/
 ├── composer.json
-├── database.sql                 # Full schema + seed data
-├── migration_plan_settings.sql  # Adds plan_settings & resume_export_log tables
-├── requirements.php             # Environment / requirements checker
+├── database.sql                  # Full schema + seed data
+├── migration_plan_settings.sql   # Adds plan_settings & resume_export_log tables
+├── migration_admin_features.sql  # Adds site_settings & activity_log tables
+├── requirements.php              # Environment / requirements checker
 ├── dashboard.php                # User resume dashboard
 ├── editor.php                   # Resume editor with live preview
 ├── preview.php                  # Public / shareable resume preview
@@ -148,6 +155,16 @@ mysql -u your_db_user -p resume_maker < migration_plan_settings.sql
 This creates two tables:
 - `plan_settings` — admin-editable limits per plan
 - `resume_export_log` — per-download audit log for rate-limiting
+
+**6. Run the admin features migration**
+
+```bash
+mysql -u your_db_user -p resume_maker < migration_admin_features.sql
+```
+
+This creates two tables:
+- `site_settings` — admin-editable branding and feature flags
+- `activity_log` — full audit trail for all user and admin actions
 
 Edit `config/app.php` and update the constants:
 

@@ -5,6 +5,7 @@ require_once __DIR__ . '/../includes/Auth.php';
 require_once __DIR__ . '/../includes/Resume.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/PlanLimits.php';
+require_once __DIR__ . '/../includes/ActivityLog.php';
 
 Auth::boot();
 Auth::requireLogin();
@@ -75,6 +76,9 @@ $mpdf = new \Mpdf\Mpdf([
 $mpdf->SetTitle($resume['title']);
 $mpdf->SetAuthor('ResumeCraft');
 $mpdf->WriteHTML($html);
+
+// Log to activity log
+ActivityLog::resumeExported($userId, $resumeId, $resume['title']);
 
 // Log the export for rate-limiting
 PlanLimits::logExport($userId, $resumeId);

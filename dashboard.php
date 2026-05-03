@@ -5,6 +5,7 @@ require_once __DIR__ . '/includes/Auth.php';
 require_once __DIR__ . '/includes/Resume.php';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/PlanLimits.php';
+require_once __DIR__ . '/includes/ActivityLog.php';
 
 Auth::boot();
 Auth::requireLogin();
@@ -25,11 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $title      = trim($_POST['title'] ?? 'My Resume');
         $templateId = (int)($_POST['template_id'] ?? 1);
         $id         = Resume::create($userId, $title ?: 'My Resume', $templateId);
+        ActivityLog::resumeCreated($userId, $id, $title ?: 'My Resume');
         redirect(APP_URL . '/editor.php?id=' . $id);
     }
     if ($_POST['action'] === 'delete') {
-        $id = (int)($_POST['resume_id'] ?? 0);
+        $id    = (int)($_POST['resume_id'] ?? 0);
+        $rdata = Database::fetchOne('SELECT title FROM resumes WHERE id = ? AND user_id = ?', [$id, $userId]);
         Resume::delete($id, $userId);
+        ActivityLog::resumeDeleted($userId, $id, $rdata['title'] ?? '');
         $_SESSION['flash'] = ['type' => 'success', 'msg' => 'Resume deleted.'];
         redirect(APP_URL . '/dashboard.php');
     }

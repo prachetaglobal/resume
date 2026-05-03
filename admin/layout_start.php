@@ -372,11 +372,39 @@
             <i class="bi bi-grid-1x2"></i> Dashboard
         </a>
 
+        <div class="sidebar-section" style="margin-top:.5rem">Manage</div>
+
+        <a href="<?= APP_URL ?>/admin/users.php"
+           class="sidebar-link <?= ($adminPage ?? '') === 'users' ? 'active' : '' ?>">
+            <i class="bi bi-people"></i> Users
+        </a>
+
+        <a href="<?= APP_URL ?>/admin/resumes.php"
+           class="sidebar-link <?= ($adminPage ?? '') === 'resumes' ? 'active' : '' ?>">
+            <i class="bi bi-file-earmark-person"></i> Resumes
+        </a>
+
         <div class="sidebar-section" style="margin-top:.5rem">Settings</div>
+
+        <a href="<?= APP_URL ?>/admin/site-settings.php"
+           class="sidebar-link <?= ($adminPage ?? '') === 'site-settings' ? 'active' : '' ?>">
+            <i class="bi bi-brush"></i> Site Settings
+        </a>
 
         <a href="<?= APP_URL ?>/admin/plan-settings.php"
            class="sidebar-link <?= ($adminPage ?? '') === 'plan-settings' ? 'active' : '' ?>">
             <i class="bi bi-sliders"></i> Plan Settings
+        </a>
+
+        <div class="sidebar-section" style="margin-top:.5rem">System</div>
+
+        <a href="<?= APP_URL ?>/admin/logs.php"
+           class="sidebar-link <?= ($adminPage ?? '') === 'logs' ? 'active' : '' ?>">
+            <i class="bi bi-journal-text"></i> Activity Logs
+        </a>
+
+        <a href="<?= APP_URL ?>/requirements.php" target="_blank" class="sidebar-link">
+            <i class="bi bi-check2-circle"></i> Requirements
         </a>
 
         <div class="sidebar-section" style="margin-top:.5rem">App</div>

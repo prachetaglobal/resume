@@ -86,19 +86,24 @@ if ($embed) {
                     });
                 });
 
-                // 3. Contact & Skills Reordering (Field-level)
-                const fieldContainers = document.querySelectorAll('.r-contact, .r-skills-list');
+                // 3. Contact, Skills, Name & Title Reordering (Field-level)
+                const fieldContainers = document.querySelectorAll('.r-contact, .r-skills-list, .r-header, .r-sidebar');
                 fieldContainers.forEach(container => {
                     new Sortable(container, {
                         group: 'fields',
-                        draggable: '.r-contact-item, .r-skill-tag',
+                        draggable: '.r-contact-item, .r-skill-tag, .r-header-item, .r-contact',
                         animation: 150,
                         ghostClass: 'preview-ghost',
                         onEnd: function(evt) {
                             const itemId = container.getAttribute('data-item-id');
                             const fields = Array.from(container.querySelectorAll('[data-field-key]'));
                             const keys = fields.map(el => el.getAttribute('data-field-key')).filter(k => k);
-                            window.parent.postMessage({ type: 'reorder_fields', itemId: itemId, keys: keys }, '*');
+                            
+                            // Special case: if we dragged the r-contact block itself, we might need to handle nested order
+                            // but for now let's just save the top-level keys
+                            if (keys.length > 0) {
+                                window.parent.postMessage({ type: 'reorder_fields', itemId: itemId, keys: keys }, '*');
+                            }
                         }
                     });
                 });
@@ -108,14 +113,18 @@ if ($embed) {
             .is-interactive .r-section, 
             .is-interactive .r-item, 
             .is-interactive .r-contact-item,
-            .is-interactive .r-skill-tag {
+            .is-interactive .r-skill-tag,
+            .is-interactive .r-header-item,
+            .is-interactive .r-contact {
                 cursor: grab !important;
                 position: relative;
             }
             .is-interactive .r-section:hover, 
             .is-interactive .r-item:hover,
             .is-interactive .r-contact-item:hover,
-            .is-interactive .r-skill-tag:hover {
+            .is-interactive .r-skill-tag:hover,
+            .is-interactive .r-header-item:hover,
+            .is-interactive .r-contact:hover {
                 outline: 2px dashed #6366f1;
                 outline-offset: 4px;
                 background: rgba(99, 102, 241, 0.05);

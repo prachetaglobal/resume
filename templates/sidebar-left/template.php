@@ -6,7 +6,7 @@ $mainSections = [];
 $sidebarSections = [];
 
 foreach ($sections as $sec) {
-    if ($sec['type'] === 'personal' && !empty($sec['items'])) $personal = $sec['items'][0]['fields'] ?? [];
+    if ($sec['type'] === 'personal' && !empty($sec['items'])) { $personal = $sec['items'][0]['fields'] ?? []; $personalItemId = $sec['items'][0]['id']; }
     if ($sec['type'] === 'summary'  && !empty($sec['items'])) $summary  = $sec['items'][0]['fields']['summary'] ?? '';
     if (in_array($sec['type'], ['experience','education','projects','awards','publications','references','custom'])) {
         $mainSections[] = $sec;
@@ -17,12 +17,12 @@ foreach ($sections as $sec) {
 ?>
 <div class="resume-wrap">
     <!-- SIDEBAR -->
-    <div class="r-sidebar">
-        <div class="r-name"><?= e($personal['name'] ?? 'Your Name') ?></div>
-        <?php if (!empty($personal['job_title'])): ?><div class="r-title"><?= e($personal['job_title']) ?></div><?php endif; ?>
+    <div class="r-sidebar" data-item-id="<?= $personalItemId ?? 0 ?>">
+        <div class="r-name r-header-item" data-field-key="name"><?= e($personal['name'] ?? 'Your Name') ?></div>
+        <?php if (!empty($personal['job_title'])): ?><div class="r-title r-header-item" data-field-key="job_title"><?= e($personal['job_title']) ?></div><?php endif; ?>
 
         <div class="r-sec-title">Contact</div>
-        <div class="r-contact" data-item-id="<?= $sections[0]['items'][0]['id'] ?? 0 ?>">
+        <div class="r-contact" data-field-key="contact" data-item-id="<?= $personalItemId ?? 0 ?>">
             <?php foreach ($personal as $key => $val): 
                 if (in_array($key, ['name','job_title']) || empty($val)) continue;
                 $icon = ['email'=>'✉', 'phone'=>'✆', 'location'=>'⌖', 'linkedin'=>'in', 'website'=>'⬡', 'github'=>'⌥'][$key] ?? '•';

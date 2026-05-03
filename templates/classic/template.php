@@ -5,7 +5,7 @@
 $personal = [];
 $summary  = '';
 foreach ($sections as $sec) {
-    if ($sec['type'] === 'personal' && !empty($sec['items'])) {
+    if ($sec['type'] === 'personal' && !empty($sec['items'])) { $personalItemId = $sec['items'][0]['id'];
         $personal = $sec['items'][0]['fields'] ?? [];
     }
     if ($sec['type'] === 'summary' && !empty($sec['items'])) {
@@ -16,12 +16,12 @@ foreach ($sections as $sec) {
 <div class="resume-wrap">
 
     <!-- Header -->
-    <header class="r-header">
-        <div class="r-name"><?= e($personal['name'] ?? 'Your Name') ?></div>
+    <header class="r-header" data-item-id="<?= $personalItemId ?? 0 ?>">
+        <div class="r-name r-header-item" data-field-key="name"><?= e($personal['name'] ?? 'Your Name') ?></div>
         <?php if (!empty($personal['job_title'])): ?>
-        <div class="r-title"><?= e($personal['job_title']) ?></div>
+        <div class="r-title r-header-item" data-field-key="job_title"><?= e($personal['job_title']) ?></div>
         <?php endif; ?>
-        <div class="r-contact" data-item-id="<?= $sections[0]['items'][0]['id'] ?? 0 ?>">
+        <div class="r-contact" data-field-key="contact" data-item-id="<?= $personalItemId ?? 0 ?>">
             <?php foreach ($personal as $key => $val): 
                 if (in_array($key, ['name','job_title']) || empty($val)) continue;
                 $icon = ['email'=>'✉', 'phone'=>'✆', 'location'=>'⌖', 'linkedin'=>'in', 'website'=>'⬡', 'github'=>'⌥'][$key] ?? '•';

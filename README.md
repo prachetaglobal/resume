@@ -39,8 +39,10 @@ ResumeCraft is a full-featured, web-based resume builder that lets users create,
 resume/
 ├── api/
 │   ├── customization.php   # Save resume styling preferences
-│   ├── export.php          # PDF generation endpoint
+│   ├── export.php          # PDF generation endpoint (enforces download limits)
 │   └── resume.php          # CRUD operations for resume data
+├── admin/
+│   └── plan-settings.php   # Admin panel: edit plan limits & view export log
 ├── assets/                 # CSS, JS, images
 ├── config/
 │   ├── app.php             # App constants, env settings
@@ -48,6 +50,7 @@ resume/
 ├── includes/
 │   ├── Auth.php            # Session & authentication logic
 │   ├── Database.php        # PDO singleton
+│   ├── PlanLimits.php      # DB-driven plan limit helper (resumes + exports)
 │   ├── Resume.php          # Core resume model & queries
 │   ├── functions.php       # Shared helper functions
 │   ├── header.php          # Shared HTML header/navbar
@@ -62,13 +65,14 @@ resume/
 │   ├── tech/
 │   └── creative/
 ├── composer.json
-├── database.sql            # Full schema + seed data
-├── requirements.php        # Environment / requirements checker
-├── dashboard.php           # User resume dashboard
-├── editor.php              # Resume editor with live preview
-├── preview.php             # Public / shareable resume preview
-├── settings.php            # Account settings
-├── index.php               # Landing page
+├── database.sql                 # Full schema + seed data
+├── migration_plan_settings.sql  # Adds plan_settings & resume_export_log tables
+├── requirements.php             # Environment / requirements checker
+├── dashboard.php                # User resume dashboard
+├── editor.php                   # Resume editor with live preview
+├── preview.php                  # Public / shareable resume preview
+├── settings.php                 # Account settings
+├── index.php                    # Landing page
 ├── login.php
 ├── register.php
 └── logout.php
@@ -132,7 +136,15 @@ composer install --optimize-autoloader
 mysql -u root -p < database.sql
 ```
 
-**5. Configure the application**
+**5. Run the plan-settings migration**
+
+```bash
+mysql -u your_db_user -p resume_maker < migration_plan_settings.sql
+```
+
+This creates two tables:
+- `plan_settings` — admin-editable limits per plan
+- `resume_export_log` — per-download audit log for rate-limiting
 
 Edit `config/app.php` and update the constants:
 
@@ -151,14 +163,14 @@ define('DB_USER', 'your_db_user');
 define('DB_PASS', 'your_db_password');
 ```
 
-**6. Set directory permissions**
+**7. Set directory permissions**
 
 ```bash
 mkdir -p uploads
 chmod -R 775 uploads
 ```
 
-**7. Configure your web server**
+**8. Configure your web server**
 
 Point the document root to `/var/www/html/resume`. The included `.htaccess` handles URL rewriting for Apache automatically.
 
@@ -177,11 +189,25 @@ Point the document root to `/var/www/html/resume`. The included `.htaccess` hand
 
 ## 📋 Plan Limits
 
-| Plan | Max Resumes |
-|---|---|
-| Free | 3 |
-| Pro | 20 |
-| Enterprise | Unlimited |
+> These are the **default** values. All limits can be changed at any time from the admin settings panel without touching code.
+
+| Plan | Max Resumes | PDF Downloads |
+|---|---|---|
+| Free | 3 | Configurable (can be restricted or capped) |
+| Pro | 20 | Configurable |
+| Enterprise | Unlimited | Unlimited |
+
+**Admin-configurable controls** (via `admin/plan-settings.php`):
+- **Max resumes per plan** — ceiling for how many resumes each plan can create; enforced in `dashboard.php`
+- **PDF exports enabled** — toggle PDF export on/off per plan; enforced in `api/export.php`
+- **Max PDF downloads per day** — daily cap per user; tracked in `resume_export_log`, enforced in `api/export.php` (HTTP 429 when exceeded)
+- **Plan assignment** — promote or demote any user's plan from the admin panel
+
+**How enforcement works:**
+1. `PlanLimits::maxResumes($plan)` is called on dashboard load — the "New Resume" button is disabled when the limit is hit
+2. `PlanLimits::canExport($userId, $plan)` is checked before every PDF render — returns `false` if disabled or daily cap exceeded
+3. Each successful download is logged to `resume_export_log` via `PlanLimits::logExport()`
+4. All limits fall back to the hardcoded constants in `config/app.php` if the `plan_settings` table is missing (safe during migration)
 
 ---
 

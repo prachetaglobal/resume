@@ -41,6 +41,10 @@
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="<?= APP_URL ?>/dashboard.php"><i class="bi bi-collection me-2"></i>My Resumes</a></li>
                         <li><a class="dropdown-item" href="<?= APP_URL ?>/settings.php"><i class="bi bi-gear me-2"></i>Settings</a></li>
+                        <?php if ($user['role'] === 'admin'): ?>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-primary" href="<?= APP_URL ?>/admin/plan-settings.php"><i class="bi bi-sliders me-2"></i>Plan Settings</a></li>
+                        <?php endif; ?>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="<?= APP_URL ?>/logout.php"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
                     </ul>

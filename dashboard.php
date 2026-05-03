@@ -4,6 +4,7 @@ require_once __DIR__ . '/includes/Database.php';
 require_once __DIR__ . '/includes/Auth.php';
 require_once __DIR__ . '/includes/Resume.php';
 require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/PlanLimits.php';
 
 Auth::boot();
 Auth::requireLogin();
@@ -12,6 +13,8 @@ $user      = Auth::user();
 $userId    = Auth::id();
 $resumes   = Resume::getAllByUser($userId);
 $templates = getTemplates();
+$maxResumes = PlanLimits::maxResumes($user['plan']); // -1 = unlimited
+$atLimit    = $maxResumes !== -1 && count($resumes) >= $maxResumes;
 
 // Handle create new resume via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -43,13 +46,13 @@ include __DIR__ . '/includes/header.php';
             <h4 class="fw-bold mb-0">My Resumes</h4>
             <p class="text-muted small mb-0">
                 <?= count($resumes) ?> resume<?= count($resumes) !== 1 ? 's' : '' ?> saved
-                <?php if ($user['plan'] === 'free'): ?>
-                — <span class="text-warning"><i class="bi bi-star-fill me-1"></i>Free plan: <?= MAX_RESUMES_FREE ?> max</span>
+                <?php if ($maxResumes !== -1): ?>
+                — <span class="text-warning"><i class="bi bi-star-fill me-1"></i><?= ucfirst($user['plan']) ?> plan: <?= $maxResumes ?> max</span>
                 <?php endif; ?>
             </p>
         </div>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newResumeModal"
-            <?= (count($resumes) >= MAX_RESUMES_FREE && $user['plan'] === 'free') ? 'disabled title="Upgrade to Pro for more resumes"' : '' ?>>
+            <?= $atLimit ? 'disabled title="You\'ve reached your plan\'s resume limit"' : '' ?>>
             <i class="bi bi-plus-lg me-1"></i> New Resume
         </button>
     </div>

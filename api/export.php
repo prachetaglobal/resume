@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/Database.php';
 require_once __DIR__ . '/../includes/Auth.php';
 require_once __DIR__ . '/../includes/Resume.php';
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/PlanLimits.php';
 
 Auth::boot();
 Auth::requireLogin();
@@ -15,6 +16,18 @@ $resume   = Resume::getById($resumeId, $userId);
 if (!$resume) {
     http_response_code(404);
     exit('Resume not found.');
+}
+
+// ── Plan limit checks ────────────────────────────────────────────────────────
+$user = Auth::user();
+if (!PlanLimits::exportsEnabled($user['plan'])) {
+    http_response_code(403);
+    exit('PDF export is not available on your current plan. Please upgrade.');
+}
+if (!PlanLimits::canExport($userId, $user['plan'])) {
+    $max = PlanLimits::maxDailyExports($user['plan']);
+    http_response_code(429);
+    exit("Daily PDF download limit reached ({$max}/day). Please try again tomorrow.");
 }
 
 $vendorAutoload = __DIR__ . '/../vendor/autoload.php';
@@ -62,6 +75,9 @@ $mpdf = new \Mpdf\Mpdf([
 $mpdf->SetTitle($resume['title']);
 $mpdf->SetAuthor('ResumeCraft');
 $mpdf->WriteHTML($html);
+
+// Log the export for rate-limiting
+PlanLimits::logExport($userId, $resumeId);
 
 // Mark as exported
 Database::query(

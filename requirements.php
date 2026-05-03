@@ -33,6 +33,17 @@ $composerPaths = [
     __DIR__ . '/vendor/ramsey/uuid'  => 'vendor/ramsey/uuid (UUID generation)',
 ];
 
+// DB tables required after migration
+$requiredTables = [
+    'plan_settings'     => 'Admin-configurable plan limits (run: migration_plan_settings.sql)',
+    'resume_export_log' => 'PDF export audit log / rate-limiting (run: migration_plan_settings.sql)',
+];
+
+// Admin pages
+$adminPaths = [
+    __DIR__ . '/admin/plan-settings.php' => 'admin/plan-settings.php (admin plan settings panel)',
+];
+
 // ── Evaluate ─────────────────────────────────────────────────────────────────
 
 $pass = true;
@@ -68,6 +79,32 @@ foreach ($composerPaths as $absPath => $label) {
     $ok = file_exists($absPath);
     $composerResults[$label] = ['ok' => $ok, 'path' => $absPath];
     $pass                    = $pass && $ok;
+}
+
+// DB table check — try to connect using config/database.php
+$tableResults = [];
+try {
+    require_once __DIR__ . '/config/database.php';
+    require_once __DIR__ . '/includes/Database.php';
+    $pdo = Database::get();
+    foreach ($requiredTables as $table => $label) {
+        $exists = (bool)$pdo->query("SHOW TABLES LIKE '$table'")->fetch();
+        $tableResults[$table] = ['ok' => $exists, 'label' => $label];
+        $pass                 = $pass && $exists;
+    }
+} catch (Throwable $e) {
+    foreach ($requiredTables as $table => $label) {
+        $tableResults[$table] = ['ok' => false, 'label' => $label . ' (DB connection failed: ' . $e->getMessage() . ')'];
+        $pass = false;
+    }
+}
+
+// Admin files
+$adminResults = [];
+foreach ($adminPaths as $absPath => $label) {
+    $ok = file_exists($absPath);
+    $adminResults[$label] = ['ok' => $ok, 'path' => $absPath];
+    $pass                 = $pass && $ok;
 }
 
 $overallClass = $pass ? 'overall-pass' : 'overall-fail';
@@ -317,6 +354,45 @@ $overallText  = $pass
             <code>sudo chown -R www-data:www-data uploads/</code>
         </div>
         <?php endif; ?>
+    </div>
+
+    <!-- DB Tables -->
+    <div class="card">
+        <div class="card-header"><span class="icon">🗄️</span> Database Tables</div>
+        <table>
+            <?php foreach ($tableResults as $table => $info): ?>
+            <tr class="<?= rowClass($info['ok']) ?>">
+                <td><?= check($info['ok']) ?></td>
+                <td>
+                    <div class="label"><?= htmlspecialchars($table) ?></div>
+                    <div class="meta"><?= htmlspecialchars($info['label']) ?></div>
+                </td>
+                <td><span class="badge"><?= $info['ok'] ? 'EXISTS' : 'MISSING' ?></span></td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+        <?php if (array_filter($tableResults, fn($r) => !$r['ok'])): ?>
+        <div class="fix-hint">
+            Run the migration: <code>mysql -u USER -p DB_NAME &lt; migration_plan_settings.sql</code>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Admin Files -->
+    <div class="card">
+        <div class="card-header"><span class="icon">🔒</span> Admin Files</div>
+        <table>
+            <?php foreach ($adminResults as $label => $info): ?>
+            <tr class="<?= rowClass($info['ok']) ?>">
+                <td><?= check($info['ok']) ?></td>
+                <td>
+                    <div class="label"><?= htmlspecialchars($label) ?></div>
+                    <div class="meta"><?= htmlspecialchars($info['path']) ?></div>
+                </td>
+                <td><span class="badge"><?= $info['ok'] ? 'FOUND' : 'MISSING' ?></span></td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
     </div>
 
     <footer>

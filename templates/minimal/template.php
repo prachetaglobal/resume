@@ -1,13 +1,21 @@
 <?php
 $personal = [];
 $summary  = '';
-foreach ($sections as $sec) {
+foreach ($sections as $sec) { 
+        if ($sec['type'] === 'personal') $personalSectionId = $sec['id'];
+        if ($sec['type'] === 'summary')  $summarySectionId = $sec['id'];
     if ($sec['type'] === 'personal' && !empty($sec['items'])) { $personal = $sec['items'][0]['fields'] ?? []; $personalItemId = $sec['items'][0]['id']; }
     if ($sec['type'] === 'summary'  && !empty($sec['items'])) $summary  = $sec['items'][0]['fields']['summary'] ?? '';
 }
 ?>
 <div class="resume-wrap">
-    <header class="r-header" data-item-id="<?= $personalItemId ?? 0 ?>">
+    
+
+    <?php foreach ($sections as $sec): 
+            if (empty($sec['items'])) continue;
+        if (!$sec['is_visible'] || $sec['type'] === 'personal' || empty($sec['items'])) continue; ?>
+    <?php if ($sec['type'] === 'personal'): ?>
+            <header class="r-header r-section" data-section-id="<?= $personalSectionId ?? 0 ?>" data-item-id="<?= $personalItemId ?? 0 ?>">
         <div class="r-name r-header-item" data-field-key="name"><?= e($personal['name'] ?? 'Your Name') ?></div>
         <?php if (!empty($personal['job_title'])): ?><div class="r-title r-header-item" data-field-key="job_title"><?= e($personal['job_title']) ?></div><?php endif; ?>
         <div class="r-contact" data-field-key="contact" data-item-id="<?= $personalItemId ?? 0 ?>">
@@ -19,10 +27,7 @@ foreach ($sections as $sec) {
             <?php endforeach; ?>
         </div>
     </header>
-
-    <?php foreach ($sections as $sec):
-        if (!$sec['is_visible'] || $sec['type'] === 'personal' || empty($sec['items'])) continue; ?>
-    <section class="r-section" data-section-id="<?= $sec["id"] ?>">
+        <?php else: ?><section class="r-section" data-section-id="<?= $sec["id"] ?>">
         <h2 class="r-section-title"><?= e($sec['title']) ?></h2>
         <?php if ($sec['type'] === 'summary'): ?>
             <p><?= nl2br(e($summary)) ?></p>
@@ -65,5 +70,6 @@ foreach ($sections as $sec) {
             <?php endforeach; ?>
         <?php endif; ?>
     </section>
+    <?php endif; ?>
     <?php endforeach; ?>
 </div>

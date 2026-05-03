@@ -4,7 +4,9 @@
 
 $personal = [];
 $summary  = '';
-foreach ($sections as $sec) {
+foreach ($sections as $sec) { 
+        if ($sec['type'] === 'personal') $personalSectionId = $sec['id'];
+        if ($sec['type'] === 'summary')  $summarySectionId = $sec['id'];
     if ($sec['type'] === 'personal' && !empty($sec['items'])) { $personalItemId = $sec['items'][0]['id'];
         $personal = $sec['items'][0]['fields'] ?? [];
     }
@@ -16,7 +18,16 @@ foreach ($sections as $sec) {
 <div class="resume-wrap">
 
     <!-- Header -->
-    <header class="r-header" data-item-id="<?= $personalItemId ?? 0 ?>">
+    
+
+    <?php foreach ($sections as $sec): 
+            if (empty($sec['items'])) continue;
+        
+        
+        if (empty($sec['items'])) continue;
+    ?>
+    <?php if ($sec['type'] === 'personal'): ?>
+            <header class="r-header r-section" data-section-id="<?= $personalSectionId ?? 0 ?>" data-item-id="<?= $personalItemId ?? 0 ?>">
         <div class="r-name r-header-item" data-field-key="name"><?= e($personal['name'] ?? 'Your Name') ?></div>
         <?php if (!empty($personal['job_title'])): ?>
         <div class="r-title r-header-item" data-field-key="job_title"><?= e($personal['job_title']) ?></div>
@@ -30,13 +41,7 @@ foreach ($sections as $sec) {
             <?php endforeach; ?>
         </div>
     </header>
-
-    <?php foreach ($sections as $sec):
-        if (!$sec['is_visible']) continue;
-        if (in_array($sec['type'], ['personal'])) continue;
-        if (empty($sec['items'])) continue;
-    ?>
-    <section class="r-section" data-section-id="<?= $sec['id'] ?>">
+        <?php else: ?><section class="r-section" data-section-id="<?= $sec['id'] ?>" style="<?= $sec['is_visible'] ? '' : 'display:none' ?>">
         <h2 class="r-section-title"><?= e($sec['title']) ?></h2>
 
         <?php if ($sec['type'] === 'summary'): ?>
@@ -95,6 +100,7 @@ foreach ($sections as $sec) {
             <?php endforeach; ?>
         <?php endif; ?>
     </section>
+    <?php endif; ?>
     <?php endforeach; ?>
 
 </div>

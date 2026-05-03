@@ -230,19 +230,31 @@ $(function () {
 
     // ── Drag & Drop Reordering ──────────────────────────────
     
-    // 1. Sections reorder
+    // 1. Sections reorder (Sidebar)
     new Sortable(document.getElementById('sectionsList'), {
         handle: '.drag-handle',
         animation: 150,
         ghostClass: 'bg-light',
         onEnd: function() {
-            const ids = [];
+            const sections = [];
             $('#sectionsList .section-block').each(function() {
-                ids.push($(this).data('section-id'));
+                // Find existing area if possible, otherwise default to current
+                // Actually, the sidebar sections are a flat list, but they have hidden area data in the DB.
+                // We should fetch the area or just send the ID and let the API preserve area if not provided.
+                sections.push({
+                    id: $(this).data('section-id'),
+                    area: $(this).data('layout-area') || 'main' 
+                });
             });
             setStatus('saving');
-            apiPost('/api/resume.php', {action: 'reorder_sections', ids: ids}, function(r) {
-                if (r.ok) { setStatus('saved'); reloadPreview(); }
+            apiPost('/api/resume.php', {
+                action: 'reorder_sections', 
+                sections: JSON.stringify(sections) 
+            }, function(r) {
+                if (r.ok) { 
+                    setStatus('saved'); 
+                    reloadPreview(); 
+                }
             });
         }
     });
@@ -280,14 +292,17 @@ $(function () {
     window.addEventListener('message', function(event) {
         const data = event.data;
         if (!data || !data.type) return;
+        console.log('Editor received message:', data);
 
         if (data.type === 'reorder_sections') {
             setStatus('saving');
-            apiPost('/api/resume.php', {action: 'reorder_sections', ids: data.ids}, function(r) {
+            apiPost('/api/resume.php', {
+                action: 'reorder_sections', 
+                sections: JSON.stringify(data.sections) 
+            }, function(r) {
                 if (r.ok) {
                     setStatus('saved');
-                    // Reload page to sync sidebar order with visual order
-                    location.reload(); 
+                    reloadPreview(); // Reload ONLY the iframe, not the whole page
                 }
             });
         }
@@ -301,8 +316,7 @@ $(function () {
             }, function(r) {
                 if (r.ok) {
                     setStatus('saved');
-                    // Reload to sync sidebar items
-                    location.reload();
+                    reloadPreview(); // Reload ONLY the iframe
                 }
             });
         }
@@ -316,8 +330,7 @@ $(function () {
             }, function(r) {
                 if (r.ok) {
                     setStatus('saved');
-                    // Reload to sync
-                    location.reload();
+                    reloadPreview(); // Reload ONLY the iframe
                 }
             });
         }

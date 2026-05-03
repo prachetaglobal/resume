@@ -32,6 +32,10 @@ if (!file_exists($tplFile)) $tplFile = TEMPLATES_PATH . 'classic/template.php';
 
 if ($embed) {
     // Stripped output for iframe preview
+    // Build a complete ordered list of ALL section IDs for this resume
+    // This is injected into JS so we can always send a complete payload (not just visible ones)
+    $allSectionIds = array_column($sections, 'id');
+    $allSectionAreas = array_column($sections, 'layout_area', 'id');
     ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -43,98 +47,143 @@ if ($embed) {
             <?= buildCustomStyles($customization) ?>
         </style>
     </head>
-    <body class="resume-preview-embed <?= $embed ? 'is-interactive' : '' ?>">
-        <?php include $tplFile; ?>
+    <body class="resume-preview-embed is-interactive">
+        <?php 
+        ob_start();
+        include $tplFile;
+        $tplHtml = ob_get_clean();
+        echo $tplHtml;
+        
+        // Inject hidden anchors for any sections the template didn't render.
+        // This ensures Sortable always has a complete section list.
+        foreach ($sections as $sec) {
+            if (strpos($tplHtml, 'data-section-id="' . $sec['id'] . '"') === false) {
+                echo '<div data-section-id="' . (int)$sec['id'] . '" style="display:none;height:0;overflow:hidden;" class="r-section-ghost"></div>';
+            }
+        }
+        ?>
 
-        <?php if ($embed): ?>
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
         <script>
-            // Identify containers for sections and items
-            document.addEventListener('DOMContentLoaded', function() {
-                // 1. Sections Reordering
-                // Some templates have multiple containers (main/sidebar)
-                const sectionContainers = document.querySelectorAll('.resume-wrap, .r-main, .r-sidebar, .r-body');
-                sectionContainers.forEach(container => {
-                    new Sortable(container, {
-                        group: 'sections',
-                        draggable: '.r-section',
-                        animation: 150,
-                        ghostClass: 'preview-ghost',
-                        onEnd: function(evt) {
-                            // Find all sections in order across the whole resume
-                            const allSections = Array.from(document.querySelectorAll('.r-section'));
-                            const ids = allSections.map(el => el.getAttribute('data-section-id')).filter(id => id);
-                            window.parent.postMessage({ type: 'reorder_sections', ids: ids }, '*');
-                        }
-                    });
-                });
+        // All section IDs in their current DB order (including invisible/empty ones)
+        const ALL_SECTION_IDS = <?= json_encode(array_map('intval', $allSectionIds)) ?>;
+        const ALL_SECTION_AREAS = <?= json_encode($allSectionAreas) ?>;
 
-                // 2. Items Reordering (entries within sections)
-                const itemContainers = document.querySelectorAll('.r-section');
-                itemContainers.forEach(container => {
-                    new Sortable(container, {
-                        group: 'items',
-                        draggable: '.r-item',
-                        animation: 150,
-                        ghostClass: 'preview-ghost',
-                        onEnd: function(evt) {
-                            const sectionId = container.getAttribute('data-section-id');
-                            const items = Array.from(container.querySelectorAll('.r-item'));
-                            const ids = items.map(el => el.getAttribute('data-item-id')).filter(id => id);
-                            window.parent.postMessage({ type: 'reorder_items', sectionId: sectionId, ids: ids }, '*');
-                        }
-                    });
-                });
+        function broadcastSections() {
+            // Step 1: Get the visible sections in their new DOM order
+            const visibleSections = Array.from(document.querySelectorAll('[data-section-id]'));
+            const visibleOrder = {}; // id -> {order, area}
+            visibleSections.forEach((el, idx) => {
+                const id = parseInt(el.getAttribute('data-section-id'), 10);
+                if (!id) return;
+                const parent = el.closest('.r-main, .r-sidebar, .r-body, .resume-wrap');
+                let area = ALL_SECTION_AREAS[id] || 'main';
+                if (parent) {
+                    if (parent.classList.contains('r-sidebar')) area = 'sidebar';
+                    else if (parent.classList.contains('r-main')) area = 'main';
+                }
+                visibleOrder[id] = { order: idx, area: area };
+            });
 
-                // 3. Contact, Skills, Name & Title Reordering (Field-level)
-                const fieldContainers = document.querySelectorAll('.r-contact, .r-skills-list, .r-header, .r-sidebar');
-                fieldContainers.forEach(container => {
-                    new Sortable(container, {
-                        group: 'fields',
-                        draggable: '.r-contact-item, .r-skill-tag, .r-header-item, .r-contact',
-                        animation: 150,
-                        ghostClass: 'preview-ghost',
-                        onEnd: function(evt) {
-                            const itemId = container.getAttribute('data-item-id');
-                            const fields = Array.from(container.querySelectorAll('[data-field-key]'));
-                            const keys = fields.map(el => el.getAttribute('data-field-key')).filter(k => k);
-                            
-                            // Special case: if we dragged the r-contact block itself, we might need to handle nested order
-                            // but for now let's just save the top-level keys
-                            if (keys.length > 0) {
-                                window.parent.postMessage({ type: 'reorder_fields', itemId: itemId, keys: keys }, '*');
-                            }
-                        }
-                    });
+            // Step 2: Build a complete payload — visible sections get their new order/area,
+            //         invisible sections keep their existing values (we offset their order so they go to the end)
+            const payload = [];
+            let hiddenOffset = visibleSections.length;
+            ALL_SECTION_IDS.forEach(id => {
+                if (visibleOrder[id] !== undefined) {
+                    payload.push({ id: id, area: visibleOrder[id].area, order: visibleOrder[id].order });
+                } else {
+                    // Not in DOM — keep existing area, push to end
+                    payload.push({ id: id, area: ALL_SECTION_AREAS[id] || 'main', order: hiddenOffset++ });
+                }
+            });
+
+            console.log('[DnD] Sending full payload:', payload);
+            window.parent.postMessage({ type: 'reorder_sections', sections: payload }, '*');
+        }
+
+        function initDragDrop() {
+            // Initialize section containers
+            const containers = document.querySelectorAll('.resume-wrap, .r-main, .r-sidebar, .r-body');
+            containers.forEach(container => {
+                // Skip resume-wrap if it contains r-main/r-sidebar (use the children instead)
+                if (container.classList.contains('resume-wrap') &&
+                    (container.querySelector('.r-main') || container.querySelector('.r-sidebar'))) {
+                    return;
+                }
+                // Skip containers that are field-level (have data-item-id for contact, etc.)
+                if (container.hasAttribute('data-item-id') && !container.hasAttribute('data-section-id')) {
+                    return;
+                }
+
+                new Sortable(container, {
+                    group: 'sections',
+                    draggable: '[data-section-id]',
+                    animation: 150,
+                    ghostClass: 'dnd-ghost',
+                    chosenClass: 'dnd-chosen',
+                    dragClass: 'dnd-drag',
+                    onEnd: function() {
+                        setTimeout(broadcastSections, 30);
+                    }
                 });
             });
+
+            // Items within sections
+            document.querySelectorAll('[data-section-id]').forEach(container => {
+                new Sortable(container, {
+                    group: 'items-' + container.getAttribute('data-section-id'),
+                    draggable: '.r-item',
+                    animation: 150,
+                    ghostClass: 'dnd-ghost',
+                    onEnd: function() {
+                        const sectionId = container.getAttribute('data-section-id');
+                        const ids = Array.from(container.querySelectorAll('.r-item'))
+                            .map(el => el.getAttribute('data-item-id'))
+                            .filter(Boolean);
+                        window.parent.postMessage({ type: 'reorder_items', sectionId, ids }, '*');
+                    }
+                });
+            });
+        }
+
+        // Run after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDragDrop);
+        } else {
+            initDragDrop();
+        }
         </script>
+
         <style>
-            .is-interactive .r-section, 
-            .is-interactive .r-item, 
-            .is-interactive .r-contact-item,
-            .is-interactive .r-skill-tag,
-            .is-interactive .r-header-item,
-            .is-interactive .r-contact {
-                cursor: grab !important;
+            /* Draggable indicators */
+            .is-interactive [data-section-id],
+            .is-interactive .r-item {
+                cursor: grab;
                 position: relative;
+                transition: box-shadow 0.15s ease;
             }
-            .is-interactive .r-section:hover, 
-            .is-interactive .r-item:hover,
-            .is-interactive .r-contact-item:hover,
-            .is-interactive .r-skill-tag:hover,
-            .is-interactive .r-header-item:hover,
-            .is-interactive .r-contact:hover {
-                outline: 2px dashed #6366f1;
-                outline-offset: 4px;
-                background: rgba(99, 102, 241, 0.05);
+            .is-interactive [data-section-id]:hover {
+                outline: 2px dashed rgba(99,102,241,0.6);
+                outline-offset: 3px;
             }
-            .preview-ghost {
-                opacity: 0.4;
-                background: #6366f1 !important;
+            .is-interactive .r-item:hover {
+                outline: 1px dashed rgba(99,102,241,0.4);
+                outline-offset: 2px;
+            }
+            .dnd-ghost {
+                opacity: 0.35;
+                background: rgba(99,102,241,0.08) !important;
+                outline: 2px dashed #6366f1 !important;
+            }
+            .dnd-chosen {
+                box-shadow: 0 4px 20px rgba(99,102,241,0.25);
+                cursor: grabbing;
+            }
+            .dnd-drag {
+                cursor: grabbing !important;
             }
         </style>
-        <?php endif; ?>
     </body>
     </html>
     <?php

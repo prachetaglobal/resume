@@ -136,11 +136,27 @@ class Resume {
         );
     }
 
-    public static function reorderSections(int $resumeId, array $orderedIds): void {
-        foreach ($orderedIds as $order => $sectionId) {
+    public static function reorderSections(int $resumeId, array $orderedData): void {
+        foreach ($orderedData as $index => $data) {
+            $sectionId = 0;
+            $area      = 'main';
+            $order     = $index; // Default to loop index
+
+            if (is_array($data)) {
+                $sectionId = (int)($data['id'] ?? 0);
+                $area      = trim($data['area'] ?? 'main');
+                if (isset($data['order'])) $order = (int)$data['order'];
+            } else {
+                $sectionId = (int)$data;
+                $existing = Database::fetchOne('SELECT layout_area FROM resume_sections WHERE id = ?', [$sectionId]);
+                if ($existing) $area = $existing['layout_area'];
+            }
+
+            if (!$sectionId) continue;
+            
             Database::query(
-                'UPDATE resume_sections SET sort_order = ? WHERE id = ? AND resume_id = ?',
-                [$order, (int)$sectionId, $resumeId]
+                'UPDATE resume_sections SET sort_order = ?, layout_area = ? WHERE id = ? AND resume_id = ?',
+                [$order, $area, $sectionId, $resumeId]
             );
         }
     }
@@ -186,9 +202,10 @@ class Resume {
 
     public static function reorderItems(int $sectionId, array $orderedIds): void {
         foreach ($orderedIds as $order => $itemId) {
+            // Update both sort_order AND section_id in case it was moved from another section
             Database::query(
-                'UPDATE resume_items SET sort_order = ? WHERE id = ? AND section_id = ?',
-                [$order, (int)$itemId, $sectionId]
+                'UPDATE resume_items SET sort_order = ?, section_id = ? WHERE id = ?',
+                [$order, $sectionId, (int)$itemId]
             );
         }
     }

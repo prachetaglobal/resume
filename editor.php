@@ -81,7 +81,7 @@ include __DIR__ . '/includes/header.php';
             <div class="tab-pane fade show active" id="tabContent">
                 <div id="sectionsList">
                     <?php foreach ($sections as $sec): ?>
-                    <div class="section-block card mb-2 border-0 shadow-sm" data-section-id="<?= $sec['id'] ?>" data-section-type="<?= $sec['type'] ?>">
+                    <div class="section-block card mb-2 border-0 shadow-sm" data-section-id="<?= $sec['id'] ?>" data-section-type="<?= $sec['type'] ?>" data-layout-area="<?= $sec['layout_area'] ?>">
                         <div class="card-header bg-white border-0 d-flex align-items-center px-3 py-2 section-header" style="cursor:pointer">
                             <i class="bi bi-grip-vertical text-muted me-2 drag-handle"></i>
                             <span class="fw-medium small flex-grow-1"><?= e($sec['title']) ?></span>

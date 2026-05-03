@@ -13,7 +13,7 @@ $resumeId = (int)($_POST['resume_id'] ?? $_GET['resume_id'] ?? 0);
 $userId   = Auth::id();
 
 // Verify ownership for all actions that need it
-if (in_array($action, ['save_title','save_fields','delete_item','add_item','switch_template'])) {
+if (in_array($action, ['save_title','save_fields','delete_item','add_item','switch_template','reorder_sections','reorder_items','reorder_fields'])) {
     if (!Auth::verifyCsrf($_POST['csrf_token'] ?? '')) {
         jsonResponse(['ok' => false, 'msg' => 'Invalid token'], 403);
     }
@@ -52,14 +52,17 @@ switch ($action) {
         jsonResponse(['ok' => $ok]);
 
     case 'reorder_sections':
-        if (!Auth::verifyCsrf($_POST['csrf_token'] ?? '')) jsonResponse(['ok' => false], 403);
-        $ids = array_map('intval', $_POST['ids'] ?? []);
-        Resume::reorderSections($resumeId, $ids);
+        $sections = $_POST['sections'] ?? [];
+        if (is_string($sections)) {
+            $sections = json_decode($sections, true);
+        }
+        if (!is_array($sections)) $sections = [];
+        
+        Resume::reorderSections($resumeId, $sections);
         Resume::touch($resumeId);
         jsonResponse(['ok' => true]);
 
     case 'reorder_items':
-        if (!Auth::verifyCsrf($_POST['csrf_token'] ?? '')) jsonResponse(['ok' => false], 403);
         $sectionId = (int)($_POST['section_id'] ?? 0);
         $ids       = array_map('intval', $_POST['ids'] ?? []);
         Resume::reorderItems($sectionId, $ids);
@@ -67,7 +70,6 @@ switch ($action) {
         jsonResponse(['ok' => true]);
 
     case 'reorder_fields':
-        if (!Auth::verifyCsrf($_POST['csrf_token'] ?? '')) jsonResponse(['ok' => false], 403);
         $itemId = (int)($_POST['item_id'] ?? 0);
         $keys   = $_POST['keys'] ?? [];
         Resume::reorderFields($itemId, $keys);
@@ -75,7 +77,6 @@ switch ($action) {
         jsonResponse(['ok' => true]);
 
     case 'toggle_section':
-        if (!Auth::verifyCsrf($_POST['csrf_token'] ?? '')) jsonResponse(['ok' => false], 403);
         $sectionId = (int)($_POST['section_id'] ?? 0);
         $visible   = (bool)(int)($_POST['visible'] ?? 1);
         Resume::toggleSection($sectionId, $resumeId, $visible);

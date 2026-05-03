@@ -43,8 +43,89 @@ if ($embed) {
             <?= buildCustomStyles($customization) ?>
         </style>
     </head>
-    <body class="resume-preview-embed">
+    <body class="resume-preview-embed <?= $embed ? 'is-interactive' : '' ?>">
         <?php include $tplFile; ?>
+
+        <?php if ($embed): ?>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+        <script>
+            // Identify containers for sections and items
+            document.addEventListener('DOMContentLoaded', function() {
+                // 1. Sections Reordering
+                // Some templates have multiple containers (main/sidebar)
+                const sectionContainers = document.querySelectorAll('.resume-wrap, .r-main, .r-sidebar, .r-body');
+                sectionContainers.forEach(container => {
+                    new Sortable(container, {
+                        group: 'sections',
+                        draggable: '.r-section',
+                        animation: 150,
+                        ghostClass: 'preview-ghost',
+                        onEnd: function(evt) {
+                            // Find all sections in order across the whole resume
+                            const allSections = Array.from(document.querySelectorAll('.r-section'));
+                            const ids = allSections.map(el => el.getAttribute('data-section-id')).filter(id => id);
+                            window.parent.postMessage({ type: 'reorder_sections', ids: ids }, '*');
+                        }
+                    });
+                });
+
+                // 2. Items Reordering (entries within sections)
+                const itemContainers = document.querySelectorAll('.r-section');
+                itemContainers.forEach(container => {
+                    new Sortable(container, {
+                        group: 'items',
+                        draggable: '.r-item',
+                        animation: 150,
+                        ghostClass: 'preview-ghost',
+                        onEnd: function(evt) {
+                            const sectionId = container.getAttribute('data-section-id');
+                            const items = Array.from(container.querySelectorAll('.r-item'));
+                            const ids = items.map(el => el.getAttribute('data-item-id')).filter(id => id);
+                            window.parent.postMessage({ type: 'reorder_items', sectionId: sectionId, ids: ids }, '*');
+                        }
+                    });
+                });
+
+                // 3. Contact & Skills Reordering (Field-level)
+                const fieldContainers = document.querySelectorAll('.r-contact, .r-skills-list');
+                fieldContainers.forEach(container => {
+                    new Sortable(container, {
+                        group: 'fields',
+                        draggable: '.r-contact-item, .r-skill-tag',
+                        animation: 150,
+                        ghostClass: 'preview-ghost',
+                        onEnd: function(evt) {
+                            const itemId = container.getAttribute('data-item-id');
+                            const fields = Array.from(container.querySelectorAll('[data-field-key]'));
+                            const keys = fields.map(el => el.getAttribute('data-field-key')).filter(k => k);
+                            window.parent.postMessage({ type: 'reorder_fields', itemId: itemId, keys: keys }, '*');
+                        }
+                    });
+                });
+            });
+        </script>
+        <style>
+            .is-interactive .r-section, 
+            .is-interactive .r-item, 
+            .is-interactive .r-contact-item,
+            .is-interactive .r-skill-tag {
+                cursor: grab !important;
+                position: relative;
+            }
+            .is-interactive .r-section:hover, 
+            .is-interactive .r-item:hover,
+            .is-interactive .r-contact-item:hover,
+            .is-interactive .r-skill-tag:hover {
+                outline: 2px dashed #6366f1;
+                outline-offset: 4px;
+                background: rgba(99, 102, 241, 0.05);
+            }
+            .preview-ghost {
+                opacity: 0.4;
+                background: #6366f1 !important;
+            }
+        </style>
+        <?php endif; ?>
     </body>
     </html>
     <?php

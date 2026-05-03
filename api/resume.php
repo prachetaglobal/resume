@@ -66,6 +66,14 @@ switch ($action) {
         Resume::touch($resumeId);
         jsonResponse(['ok' => true]);
 
+    case 'reorder_fields':
+        if (!Auth::verifyCsrf($_POST['csrf_token'] ?? '')) jsonResponse(['ok' => false], 403);
+        $itemId = (int)($_POST['item_id'] ?? 0);
+        $keys   = $_POST['keys'] ?? [];
+        Resume::reorderFields($itemId, $keys);
+        Resume::touch($resumeId);
+        jsonResponse(['ok' => true]);
+
     case 'toggle_section':
         if (!Auth::verifyCsrf($_POST['csrf_token'] ?? '')) jsonResponse(['ok' => false], 403);
         $sectionId = (int)($_POST['section_id'] ?? 0);

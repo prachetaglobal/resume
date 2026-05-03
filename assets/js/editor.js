@@ -275,6 +275,54 @@ $(function () {
     }
     initItemsSortable();
 
+    // ── Visual Drag & Drop (Iframe Bridge) ──────────────────
+    
+    window.addEventListener('message', function(event) {
+        const data = event.data;
+        if (!data || !data.type) return;
+
+        if (data.type === 'reorder_sections') {
+            setStatus('saving');
+            apiPost('/api/resume.php', {action: 'reorder_sections', ids: data.ids}, function(r) {
+                if (r.ok) {
+                    setStatus('saved');
+                    // Reload page to sync sidebar order with visual order
+                    location.reload(); 
+                }
+            });
+        }
+
+        if (data.type === 'reorder_items') {
+            setStatus('saving');
+            apiPost('/api/resume.php', {
+                action: 'reorder_items', 
+                section_id: data.sectionId, 
+                ids: data.ids
+            }, function(r) {
+                if (r.ok) {
+                    setStatus('saved');
+                    // Reload to sync sidebar items
+                    location.reload();
+                }
+            });
+        }
+
+        if (data.type === 'reorder_fields') {
+            setStatus('saving');
+            apiPost('/api/resume.php', {
+                action: 'reorder_fields', 
+                item_id: data.itemId, 
+                keys: data.keys
+            }, function(r) {
+                if (r.ok) {
+                    setStatus('saved');
+                    // Reload to sync
+                    location.reload();
+                }
+            });
+        }
+    });
+
     // ── Preview zoom ─────────────────────────────────────────
 
     function applyZoom(scale) {

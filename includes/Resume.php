@@ -199,12 +199,21 @@ class Resume {
 
     public static function getFields(int $itemId): array {
         $rows = Database::fetchAll(
-            'SELECT field_key, field_value FROM resume_fields WHERE item_id = ?',
+            'SELECT field_key, field_value FROM resume_fields WHERE item_id = ? ORDER BY sort_order ASC, id ASC',
             [$itemId]
         );
         $out = [];
         foreach ($rows as $r) $out[$r['field_key']] = $r['field_value'];
         return $out;
+    }
+
+    public static function reorderFields(int $itemId, array $orderedKeys): void {
+        foreach ($orderedKeys as $order => $key) {
+            Database::query(
+                'UPDATE resume_fields SET sort_order = ? WHERE item_id = ? AND field_key = ?',
+                [$order, $itemId, $key]
+            );
+        }
     }
 
     public static function saveFields(int $itemId, array $fields): void {

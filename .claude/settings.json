@@ -20,7 +20,9 @@
       "Bash(DATABASE_URL=\"mysql://user:pass@localhost:3306/db\" npx prisma generate)",
       "Bash(npx prisma *)",
       "Bash(printf 'DATABASE_URL=\"mysql://user:pass@localhost:3306/db\"')",
-      "Bash(rm -f .env.local)"
+      "Bash(rm -f .env.local)",
+      "Bash(git pull *)",
+      "Bash(git stash *)"
     ],
     "additionalDirectories": [
       "/home/meet/resume-next",

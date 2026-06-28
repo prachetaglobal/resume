@@ -2,7 +2,44 @@
   "permissions": {
     "allow": [
       "Read(//home/meet/.ssh/**)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Read(//home/meet/**)",
+      "Bash(npx create-next-app@latest resume-next --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --use-npm --yes)",
+      "Bash(ls /home/meet/resume-next 2>/dev/null && echo \"EXISTS\" || echo \"NOT YET\")",
+      "Read(//home/meet/resume-next/**)",
+      "Bash(npm install *)",
+      "Read(//home/meet/resume-next/app/**)",
+      "Bash(mkdir -p /home/meet/resume-next/prisma /home/meet/resume-next/types /home/meet/resume-next/lib /home/meet/resume-next/components/ui /home/meet/resume-next/components/editor/panels /home/meet/resume-next/components/editor/sections/forms /home/meet/resume-next/components/templates /home/meet/resume-next/components/dashboard)",
+      "Bash(mkdir -p /home/meet/resume-next/app/\\\\\\(auth\\\\\\)/login /home/meet/resume-next/app/\\\\\\(auth\\\\\\)/register /home/meet/resume-next/app/\\\\\\(app\\\\\\)/dashboard /home/meet/resume-next/app/\\\\\\(app\\\\\\)/editor/\\\\[id\\\\] /home/meet/resume-next/app/api/auth/login /home/meet/resume-next/app/api/auth/register /home/meet/resume-next/app/api/auth/logout /home/meet/resume-next/app/api/resume/\\\\[id\\\\] /home/meet/resume-next/app/api/section /home/meet/resume-next/app/api/item /home/meet/resume-next/app/api/customization/\\\\[id\\\\] /home/meet/resume-next/app/api/export/\\\\[id\\\\] /home/meet/resume-next/app/api/ai)",
+      "Bash(mkdir -p \"app/\\(auth\\)/login\" \"app/\\(auth\\)/register\" \"app/\\(app\\)/dashboard\" \"app/\\(app\\)/editor/[id]\" \"app/api/auth/login\" \"app/api/auth/register\" \"app/api/auth/logout\" \"app/api/resume/[id]\" \"app/api/section\" \"app/api/item\" \"app/api/customization/[id]\" \"app/api/export/[id]\" \"app/api/ai\")",
+      "Bash(mkdir -p \"/home/meet/resume-next/app/\\(auth\\)/login\" \"/home/meet/resume-next/app/\\(auth\\)/register\" \"/home/meet/resume-next/app/\\(app\\)/dashboard\" \"/home/meet/resume-next/app/\\(app\\)/editor/[id]\" \"/home/meet/resume-next/app/api/auth/login\" \"/home/meet/resume-next/app/api/auth/register\" \"/home/meet/resume-next/app/api/auth/logout\" \"/home/meet/resume-next/app/api/resume/[id]\" \"/home/meet/resume-next/app/api/section\" \"/home/meet/resume-next/app/api/item\" \"/home/meet/resume-next/app/api/customization/[id]\" \"/home/meet/resume-next/app/api/export/[id]\" \"/home/meet/resume-next/app/api/ai\" && echo \"done\")",
+      "Bash(cat /home/meet/resume-next/package.json)",
+      "Bash(npx tsc *)",
+      "Bash(DATABASE_URL=\"mysql://user:pass@localhost:3306/db\" npx prisma generate)",
+      "Bash(npx prisma *)",
+      "Bash(printf 'DATABASE_URL=\"mysql://user:pass@localhost:3306/db\"')",
+      "Bash(rm -f .env.local)"
+    ],
+    "additionalDirectories": [
+      "/home/meet/resume-next",
+      "/home/meet/resume-next/app/(app)/editor",
+      "/home/meet/resume-next/app/(auth)/login",
+      "/home/meet/resume-next/app/(auth)/register",
+      "/home/meet/resume-next/app/api/auth/login",
+      "/home/meet/resume-next/app/api/auth/register",
+      "/home/meet/resume-next/app/api/auth/logout",
+      "/home/meet/resume-next/app/api/resume/[id]",
+      "/home/meet/resume-next/app/api/section",
+      "/home/meet/resume-next/app/api/item",
+      "/home/meet/resume-next/app/api/customization/[id]",
+      "/home/meet/resume-next/app/api/ai",
+      "/home/meet/resume-next/app/api/export/[id]",
+      "/home/meet/resume-next/app/(app)/dashboard",
+      "/home/meet/resume-next/components/templates",
+      "/home/meet/resume-next/components/editor",
+      "/home/meet/resume-next/app/(app)/editor/[id]"
     ]
   }
 }
